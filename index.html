@@ -1,0 +1,68 @@
+<head>
+    <title>Sierpinski Visualization</title>
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #main-canvas {
+            width: 100% !important;
+            height: 100% !important;
+            background: linear-gradient(black, #303030);
+        }
+    </style>
+</head>
+<body>
+
+<script type="x-shader/x-vertex" id="vertexShader">
+    attribute vec3 color;
+    attribute vec3 cnormal;
+
+    varying vec3 vPos;
+    varying vec3 vNormal;
+    varying vec3 vColor;
+
+    void main() {
+        gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+        vPos = position;
+        vNormal = cnormal;
+        vColor = color;
+
+    }
+</script>
+
+<script type="x-shader/x-fragment" id="fragmentShader">
+    varying vec3 vPos;
+    varying vec3 vNormal;
+    varying vec3 vColor;
+
+    uniform bool useColor;
+    uniform bool useLambert;
+    uniform bool useDepth;
+
+    void main() {
+        vec3 l = normalize(vec3(1, 1, 1));
+        vec3 v = normalize(cameraPosition);
+
+        vec3 c = useColor ? vColor : vec3(1, 1, 1); //(vNormal + vec3(1,1,1) * 0.5);
+        float i = useLambert ? (max(dot(vNormal, l), 0.) * 0.5 + 0.3) : 1.;
+        float d = useDepth ? (1. - length(vPos - v) * (useLambert ? 0.5 : .8)) : 1.;
+
+        gl_FragColor.rgb = c * i * d;
+        gl_FragColor.a = 1.0;
+    }
+</script>
+
+<canvas id="main-canvas"></canvas>
+
+<script type="application/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.2/dat.gui.min.js"></script>
+<script type="application/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/three.js/93/three.min.js"></script>
+<script type="application/javascript"
+        src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+<script type="application/javascript"
+        src="index.js"></script>
+</body>
