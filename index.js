@@ -1,4 +1,4 @@
-/* global dat, THREE */
+/* global THREE */
 
 !function () {
 
