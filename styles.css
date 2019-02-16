@@ -31,16 +31,23 @@ body {
     height: 16px;
 }
 
-#progress-background {
+#progress-bar, #speed-bar {
     display: inline-block;
     padding: 0;
     background: white;
     height: 16px;
     margin: 10px;
+}
+
+#progress-bar {
     flex-grow: 1;
 }
 
-#progress-value {
+#speed-bar {
+    width: 100px;
+}
+
+#progress-value, #speed-value {
     display: inline-block;
     height: 100%;
     background-color: darkcyan;

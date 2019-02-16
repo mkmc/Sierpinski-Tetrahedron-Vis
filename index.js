@@ -3,6 +3,7 @@
 !function () {
 
     const MAX_TIME = 8;
+    const MAX_SPEED = 1;
 
     const options = {
         time: 1.5,
@@ -15,8 +16,10 @@
     };
 
     const playstopButtonElement = document.getElementById('playstop-button');
-    const progressBackgroundElement = document.getElementById('progress-background');
+    const progressBarElement = document.getElementById('progress-bar');
     const progressValueElement = document.getElementById('progress-value');
+    const speedBarElement = document.getElementById('speed-bar');
+    const speedValueElement = document.getElementById('speed-value');
 
     const canvasElement = document.getElementById('main-canvas');
     const renderer = new THREE.WebGLRenderer({
@@ -295,7 +298,18 @@
         scene.add(mesh);
     };
 
+    const setSpeed = function (speed) {
+        if (!speed) {
+            speed = 0;
+        }
+
+        speed = Math.min(MAX_SPEED, Math.max(0, speed));
+        options.speed = speed;
+        speedValueElement.style.width = speed / MAX_SPEED * 100 + '%';
+    };
+
     setTime(options.time);
+    setSpeed(options.speed);
 
     options['floor'] = function () {
         setTime(options.time = Math.floor(options.time));
@@ -324,8 +338,11 @@
     };
 
     playstopButtonElement.addEventListener('click', togglePlay);
-    progressBackgroundElement.addEventListener('click', function (e) {
+    progressBarElement.addEventListener('click', function (e) {
         setTime(e.offsetX / e.target.offsetWidth * MAX_TIME);
+    });
+    speedBarElement.addEventListener('click', function (e) {
+        setSpeed(e.offsetX / e.target.offsetWidth * MAX_SPEED);
     });
 
     // === GUI ===
@@ -340,7 +357,6 @@
     gui.add(options, 'useLambert').onChange(v => {
         material.uniforms.useLambert.value = v;
     });
-    gui.add(options, 'speed', 0, 1, 0.01);
     gui.add(options, 'loop');
     gui.add(options, 'reset camera');
 
