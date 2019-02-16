@@ -45,17 +45,20 @@
     });
 
     const camera = new THREE.PerspectiveCamera(45, canvasElement.clientWidth / canvasElement.clientHeight, 0.0001, 10);
-    camera.position.set(0, 0, 3);
-    camera.lookAt(0, 0, 0);
 
     const controls = new THREE.OrbitControls(camera, canvasElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.25;
     controls.screenSpacePanning = false;
     //controls.maxPolarAngle = Math.PI / 2;
-    controls.target = new THREE.Vector3(0, 0.3, 0);
 
     // === ANIMATION METHODS ===
+
+    const resetCamera = function () {
+        camera.position.set(1.5, 1, 1.5);
+        camera.lookAt(0, 0.3, 0);
+        controls.target = new THREE.Vector3(0, 0.3, 0);
+    };
 
     const clearScene = function () {
         scene.children.forEach(c => {
@@ -100,12 +103,6 @@
     // === UI ===
 
     !function () {
-        const resetCamera = function () {
-            camera.position.set(0, 3, 0);
-            camera.lookAt(0, 0, 0);
-            controls.target = new THREE.Vector3(0, 0.3, 0);
-        };
-
         const togglePlay = function () {
             options.animate = !options.animate;
 
@@ -246,6 +243,9 @@
 
             requestAnimationFrame(animate);
         };
+
+        // initial camera position
+        resetCamera();
 
         // create initial geometry
         setTime(options.time);
