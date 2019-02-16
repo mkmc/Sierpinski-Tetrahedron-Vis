@@ -15,7 +15,7 @@ const GeometryHelper = function () {
                 vecC, vecBC.clone(), vecCA.clone(),
                 vecAB.clone(), vecCA.clone(), vecBC.clone()
             ],
-            colors: ['r', 'g', 'b', 'k']
+            colors: [[1, 0, 0], [0, 1, 0], [0, 0, 1], [0, 0, 0]]
         };
     };
 
@@ -40,7 +40,7 @@ const GeometryHelper = function () {
         }
     };
 
-    const split = function (vertices, colors) {
+    const split = function (vertices, colors, fraction) {
         const newVertices = [];
         const newColors = [];
 
@@ -65,31 +65,22 @@ const GeometryHelper = function () {
 
             const c0 = colors[i / 3];
             let c1, c2, c3;
-            switch (c0) {
-                case 'r':
-                    c1 = 'k';
-                    c2 = 'g';
-                    c3 = 'b';
-                    break;
-                case 'g':
-                    c1 = 'k';
-                    c2 = 'b';
-                    c3 = 'r';
-                    break;
-                case 'b':
-                    c1 = 'k';
-                    c2 = 'r';
-                    c3 = 'g';
-                    break;
-                case 'k':
-                    c1 = 'b';
-                    c2 = 'g';
-                    c3 = 'r';
-                    break;
-                default:
-                    c1 = '?';
-                    c2 = '?';
-                    c3 = '?';
+            if (c0[0] === 1) {
+                c1 = [1 - fraction, 0, 0];
+                c2 = [1 - fraction, fraction, 0];
+                c3 = [1 - fraction, 0, fraction];
+            } else if (c0[1] === 1) {
+                c1 = [0, 1 - fraction, 0];
+                c2 = [0, 1 - fraction, fraction];
+                c3 = [fraction, 1 - fraction, 0];
+            } else if (c0[2] === 1) {
+                c1 = [0, 0, 1 - fraction];
+                c2 = [fraction, 0, 1 - fraction];
+                c3 = [0, fraction, 1 - fraction];
+            } else {
+                c1 = [0, 0, fraction];
+                c2 = [0, fraction, 0];
+                c3 = [fraction, 0, 0];
             }
 
             newColors.push(c0, c0, c0, c1, c2, c3);
@@ -154,8 +145,8 @@ const GeometryHelper = function () {
 
             if (time > 1) {
                 if (time % 1 !== 0) {
-                    ({vertices, colors} = split(vertices, colors));
-                    foldIn(vertices, ((time - 1) % 1));
+                    ({vertices, colors} = split(vertices, colors, time % 1));
+                    foldIn(vertices, time % 1);
                 }
 
                 vertices.forEach(v => {
@@ -187,32 +178,9 @@ const GeometryHelper = function () {
                     bufferNormals[offset + 1] = normals[Math.floor(j / 3)].y;
                     bufferNormals[offset + 2] = normals[Math.floor(j / 3)].z;
 
-                    switch (colors[Math.floor(j / 3)]) {
-                        case 'r':
-                            bufferColors[offset] = 1;
-                            bufferColors[offset + 1] = 0;
-                            bufferColors[offset + 2] = 0;
-                            break;
-                        case 'g':
-                            bufferColors[offset] = 0;
-                            bufferColors[offset + 1] = 1;
-                            bufferColors[offset + 2] = 0;
-                            break;
-                        case 'b':
-                            bufferColors[offset] = 0;
-                            bufferColors[offset + 1] = 0;
-                            bufferColors[offset + 2] = 1;
-                            break;
-                        case 'k':
-                            bufferColors[offset] = 0;
-                            bufferColors[offset + 1] = 0;
-                            bufferColors[offset + 2] = 0;
-                            break;
-                        default:
-                            bufferColors[offset] = 1;
-                            bufferColors[offset + 1] = 1;
-                            bufferColors[offset + 2] = 1;
-                    }
+                    bufferColors[offset] = colors[Math.floor(j / 3)][0];
+                    bufferColors[offset + 1] = colors[Math.floor(j / 3)][1];
+                    bufferColors[offset + 2] = colors[Math.floor(j / 3)][2];
                 });
             });
 
