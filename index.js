@@ -3,25 +3,31 @@
 !function () {
 
     const MAX_TIME = 8;
-    const MAX_SPEED = 1;
+    const MAX_SPEED = 2;
 
     const options = {
         time: 1.5,
         speed: 0.5,
         animate: false,
-        loop: false,
-        useColor: true,
-        useLambert: true,
-        useDepth: true
+        loop: false
     };
 
-    const playstopButtonElement = document.getElementById('playstop-button');
+    const playstopButton = document.getElementById('playstop-button');
+    const loopButton = document.getElementById('loop-button');
+    const useColorButton = document.getElementById('usecolor-button');
+    const useDepthButton = document.getElementById('usedepth-button');
+    const useLambertButton = document.getElementById('uselambert-button');
+    const resetCamButton = document.getElementById('resetcam-button');
+
     const progressBarElement = document.getElementById('progress-bar');
     const progressValueElement = document.getElementById('progress-value');
     const speedBarElement = document.getElementById('speed-bar');
     const speedValueElement = document.getElementById('speed-value');
 
     const canvasElement = document.getElementById('main-canvas');
+
+    // === INIT RENDERER & SCENE ===
+
     const renderer = new THREE.WebGLRenderer({
         canvas: canvasElement,
         alpha: true,
@@ -32,11 +38,7 @@
     const scene = new THREE.Scene();
 
     const material = new THREE.ShaderMaterial({
-        uniforms: {
-            useColor: {value: options.useColor},
-            useDepth: {value: options.useDepth},
-            useLambert: {value: options.useLambert}
-        },
+        uniforms: {useColor: {value: true}, useDepth: {value: true}, useLambert: {value: true}},
         vertexShader: document.getElementById('vertexShader').textContent,
         fragmentShader: document.getElementById('fragmentShader').textContent,
         side: THREE.DoubleSide
@@ -53,11 +55,7 @@
     //controls.maxPolarAngle = Math.PI / 2;
     controls.target = new THREE.Vector3(0, 0.3, 0);
 
-    options['reset camera'] = function () {
-        camera.position.set(0, 3, 0);
-        camera.lookAt(0, 0, 0);
-        controls.target = new THREE.Vector3(0, 0.3, 0);
-    };
+    // === ANIMATION METHODS ===
 
     const clearScene = function () {
         scene.children.forEach(c => {
@@ -92,101 +90,167 @@
         speedValueElement.style.width = speed / MAX_SPEED * 100 + '%';
     };
 
-    setTime(options.time);
-    setSpeed(options.speed);
-
-    options['floor'] = function () {
-        setTime(options.time = Math.floor(options.time));
-    };
-    options['ceiling'] = function () {
-        setTime(options.time = Math.ceil(options.time));
-    };
-
-    const togglePlay = function () {
-        options.animate = !options.animate;
-
-        if (options.animate) {
-            playstopButtonElement.classList.remove('fa-play');
-            playstopButtonElement.classList.add('fa-pause');
-        } else {
-            playstopButtonElement.classList.remove('fa-pause');
-            playstopButtonElement.classList.add('fa-play');
-        }
-    };
-
     const pause = function () {
         options.animate = 0;
 
-        playstopButtonElement.classList.remove('fa-pause');
-        playstopButtonElement.classList.add('fa-play');
+        playstopButton.classList.remove('fa-pause');
+        playstopButton.classList.add('fa-play');
     };
 
-    playstopButtonElement.addEventListener('click', togglePlay);
-    progressBarElement.addEventListener('click', function (e) {
-        setTime(e.offsetX / e.target.offsetWidth * MAX_TIME);
-    });
-    speedBarElement.addEventListener('click', function (e) {
-        setSpeed(e.offsetX / e.target.offsetWidth * MAX_SPEED);
-    });
+    // === UI ===
 
-    // === GUI ===
+    !function () {
+        const resetCamera = function () {
+            camera.position.set(0, 3, 0);
+            camera.lookAt(0, 0, 0);
+            controls.target = new THREE.Vector3(0, 0.3, 0);
+        };
 
-    const gui = new dat.GUI();
-    gui.add(options, 'useColor').onChange(v => {
-        material.uniforms.useColor.value = v;
-    });
-    gui.add(options, 'useDepth').onChange(v => {
-        material.uniforms.useDepth.value = v;
-    });
-    gui.add(options, 'useLambert').onChange(v => {
-        material.uniforms.useLambert.value = v;
-    });
-    gui.add(options, 'loop');
-    gui.add(options, 'reset camera');
+        const togglePlay = function () {
+            options.animate = !options.animate;
+
+            if (options.animate) {
+                if (options.time === MAX_TIME) {
+                    options.time = 0;
+                }
+
+                playstopButton.classList.remove('fa-play');
+                playstopButton.classList.add('fa-pause');
+            } else {
+                playstopButton.classList.remove('fa-pause');
+                playstopButton.classList.add('fa-play');
+            }
+        };
+
+        const toggleLoop = function () {
+            if (options.loop) {
+                options.loop = false;
+                loopButton.classList.remove('active');
+                loopButton.classList.add('inactive');
+            } else {
+                options.loop = true;
+                loopButton.classList.remove('inactive');
+                loopButton.classList.add('active');
+            }
+        };
+
+        const toggleColor = function () {
+            if (material.uniforms.useColor.value) {
+                material.uniforms.useColor.value = false;
+                useColorButton.classList.remove('active');
+                useColorButton.classList.add('inactive');
+            } else {
+                material.uniforms.useColor.value = true;
+                useColorButton.classList.remove('inactive');
+                useColorButton.classList.add('active');
+            }
+        };
+
+        const toggleDepth = function () {
+            if (material.uniforms.useDepth.value) {
+                material.uniforms.useDepth.value = false;
+                useDepthButton.classList.remove('active');
+                useDepthButton.classList.add('inactive');
+            } else {
+                material.uniforms.useDepth.value = true;
+                useDepthButton.classList.remove('inactive');
+                useDepthButton.classList.add('active');
+            }
+        };
+
+        const toggleLambert = function () {
+            if (material.uniforms.useLambert.value) {
+                material.uniforms.useLambert.value = false;
+                useLambertButton.classList.remove('active');
+                useLambertButton.classList.add('inactive');
+            } else {
+                material.uniforms.useLambert.value = true;
+                useLambertButton.classList.remove('inactive');
+                useLambertButton.classList.add('active');
+            }
+        };
+
+        playstopButton.addEventListener('click', togglePlay);
+        loopButton.addEventListener('click', toggleLoop);
+        useColorButton.addEventListener('click', toggleColor);
+        useDepthButton.addEventListener('click', toggleDepth);
+        useLambertButton.addEventListener('click', toggleLambert);
+        resetCamButton.addEventListener('click', resetCamera);
+
+        let isBoundToProgress = false;
+        let isBoundToSpeed = false;
+
+        progressBarElement.addEventListener('mousedown', function (e) {
+            setTime(e.offsetX / progressBarElement.offsetWidth * MAX_TIME);
+            isBoundToProgress = true;
+        });
+        speedBarElement.addEventListener('mousedown', function (e) {
+            setSpeed(e.offsetX / speedBarElement.offsetWidth * MAX_SPEED);
+            isBoundToSpeed = true;
+        });
+        document.addEventListener('mousemove', function (e) {
+            if (isBoundToProgress) {
+                setTime((e.pageX - progressBarElement.offsetLeft) / progressBarElement.offsetWidth * MAX_TIME);
+            } else if (isBoundToSpeed) {
+                setSpeed((e.pageX - speedBarElement.offsetLeft) / speedBarElement.offsetWidth * MAX_SPEED);
+            }
+        });
+        document.addEventListener('mouseup', function (e) {
+            isBoundToProgress = false;
+            isBoundToSpeed = false;
+        });
+    }();
 
     // === RENDER / ANIMATION LOOP ===
 
-    let lastTime = 0;
-    const animate = function () {
-        const now = performance.now();
-        if (!lastTime) {
-            lastTime = now;
-        }
+    !function () {
+        let lastTime = 0;
+        const animate = function () {
+            const now = performance.now();
+            if (!lastTime) {
+                lastTime = now;
+            }
 
-        if (options.animate) {
-            const dt = now - lastTime;
+            if (options.animate) {
+                const dt = now - lastTime;
 
-            let newTime = options.time + options.speed * dt / 1000;
-            while (newTime > MAX_TIME) {
-                if (options.loop) {
-                    newTime -= MAX_TIME;
-                } else {
-                    newTime = MAX_TIME;
-                    pause();
+                let newTime = options.time + options.speed * dt / 1000;
+                while (newTime > MAX_TIME) {
+                    if (options.loop) {
+                        newTime -= MAX_TIME;
+                    } else {
+                        newTime = MAX_TIME;
+                        pause();
+                    }
+                }
+
+                if (options.time !== newTime) {
+                    setTime(newTime);
                 }
             }
 
-            if (options.time !== newTime) {
-                setTime(newTime);
+            if (renderer.getSize().width !== canvasElement.clientWidth
+                || renderer.getSize().height !== canvasElement.clientHeight) {
+                renderer.setSize(canvasElement.clientWidth, canvasElement.clientHeight);
+
+                camera.aspect = canvasElement.clientWidth / canvasElement.clientHeight;
+                camera.updateProjectionMatrix();
+
+                controls.update();
             }
-        }
 
-        if (renderer.getSize().width !== canvasElement.clientWidth
-            || renderer.getSize().height !== canvasElement.clientHeight) {
-            renderer.setSize(canvasElement.clientWidth, canvasElement.clientHeight);
+            renderer.render(scene, camera);
 
-            camera.aspect = canvasElement.clientWidth / canvasElement.clientHeight;
-            camera.updateProjectionMatrix();
+            lastTime = now;
 
-            controls.update();
-        }
+            requestAnimationFrame(animate);
+        };
 
-        renderer.render(scene, camera);
+        // create initial geometry
+        setTime(options.time);
+        setSpeed(options.speed);
 
-        lastTime = now;
-
-        requestAnimationFrame(animate);
-    };
-
-    animate();
+        // trigger render loop
+        animate();
+    }();
 }();

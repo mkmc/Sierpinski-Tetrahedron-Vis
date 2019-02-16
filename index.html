@@ -1,6 +1,6 @@
 <head>
     <title>Sierpinski Visualization</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
@@ -53,17 +53,24 @@
         <span id="progress-value"></span>
     </span>
 
-    <span id="speed-bar">
+    <i id="loop-button" title="loop animation" class="fas fa-redo-alt inactive"></i>
+
+    <span title="animation speed" id="speed-bar">
         <span id="speed-value"></span>
     </span>
+
+    <span id="resetcam-button" title="reset camera" class="fa-stack">
+        <i class="fas fa-video fa-stack-2x"></i>
+        <i class="fas fa-redo-alt fa-stack-1x fa-inverse"></i>
+    </span>
+
+    <i id="usecolor-button" title="color triangles" class="fas fa-palette active"></i>
+    <i id="usedepth-button" title="more distant triangles are darker" class="fas fa-ruler-horizontal active"></i>
+    <i id="uselambert-button" title="use lambert shading" class="fas fa-sun active"></i>
 </div>
 
-<script type="application/javascript"
-        src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.2/dat.gui.min.js"></script>
-<script type="application/javascript"
-        src="https://cdnjs.cloudflare.com/ajax/libs/three.js/93/three.min.js"></script>
-<script type="application/javascript"
-        src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+<script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/93/three.min.js"></script>
+<script type="application/javascript" src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
 
 <script type="application/javascript" src="geometryHelper.js"></script>
 <script type="application/javascript" src="index.js"></script>

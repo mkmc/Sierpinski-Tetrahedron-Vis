@@ -27,7 +27,7 @@ const GeometryHelper = function () {
     /**
      * Folds the base triangle into a tetrahedron.
      */
-    const foldBasicVerticesUp = function (percentage) {
+    const foldBasicVerticesUp = function (vertices, percentage) {
         for (let i = 0; i < vertices.length; i = i + 3) {
             if ((i / 3) % 4 === 3) {
                 // skip the bottom
