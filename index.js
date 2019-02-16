@@ -231,6 +231,7 @@
 
             if (renderer.getSize().width !== canvasElement.clientWidth
                 || renderer.getSize().height !== canvasElement.clientHeight) {
+                renderer.setPixelRatio(window.devicePixelRatio);
                 renderer.setSize(canvasElement.clientWidth, canvasElement.clientHeight);
 
                 camera.aspect = canvasElement.clientWidth / canvasElement.clientHeight;
