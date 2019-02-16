@@ -1,4 +1,9 @@
 const GeometryHelper = function () {
+
+    /**
+     * Generates the vertices of the base triangle, already split into four triangles representing the sides of the
+     * tetrahedron.
+     */
     const createBaseVertices = function () {
         const vecA = new THREE.Vector3().setFromCylindrical(new THREE.Cylindrical(1, 0));
         const vecB = new THREE.Vector3().setFromCylindrical(new THREE.Cylindrical(1, 2 * Math.PI / 3));
@@ -19,7 +24,10 @@ const GeometryHelper = function () {
         };
     };
 
-    const foldBasicVerticesUp = function (vertices, percentage) {
+    /**
+     * Folds the base triangle into a tetrahedron.
+     */
+    const foldBasicVerticesUp = function (percentage) {
         for (let i = 0; i < vertices.length; i = i + 3) {
             if ((i / 3) % 4 === 3) {
                 // skip the bottom
@@ -40,6 +48,10 @@ const GeometryHelper = function () {
         }
     };
 
+    /**
+     * Splits all four sides of the tetrahedron into 6 triangles. The colors of the inner 3, which will be folded into
+     * the inside, are interpolated between the color of the origin side and the color of the destination.
+     */
     const split = function (vertices, colors, fraction) {
         const newVertices = [];
         const newColors = [];
@@ -66,21 +78,21 @@ const GeometryHelper = function () {
             const c0 = colors[i / 3];
             let c1, c2, c3;
             if (c0[0] === 1) {
-                c1 = [1 - fraction, 0, 0];
-                c2 = [1 - fraction, fraction, 0];
-                c3 = [1 - fraction, 0, fraction];
+                c1 = [1 - fraction, 0, 0]; // red => black
+                c2 = [1 - fraction, fraction, 0]; // red => green
+                c3 = [1 - fraction, 0, fraction]; // red => blue
             } else if (c0[1] === 1) {
-                c1 = [0, 1 - fraction, 0];
-                c2 = [0, 1 - fraction, fraction];
-                c3 = [fraction, 1 - fraction, 0];
+                c1 = [0, 1 - fraction, 0]; // green => black
+                c2 = [0, 1 - fraction, fraction]; // green => blue
+                c3 = [fraction, 1 - fraction, 0]; // green => red
             } else if (c0[2] === 1) {
-                c1 = [0, 0, 1 - fraction];
-                c2 = [fraction, 0, 1 - fraction];
-                c3 = [0, fraction, 1 - fraction];
+                c1 = [0, 0, 1 - fraction]; // blue => black
+                c2 = [fraction, 0, 1 - fraction]; // blue => red
+                c3 = [0, fraction, 1 - fraction]; // blue => green
             } else {
-                c1 = [0, 0, fraction];
-                c2 = [0, fraction, 0];
-                c3 = [fraction, 0, 0];
+                c1 = [0, 0, fraction]; // black => blue
+                c2 = [0, fraction, 0]; // black => green
+                c3 = [fraction, 0, 0]; // black => red
             }
 
             newColors.push(c0, c0, c0, c1, c2, c3);
@@ -88,8 +100,9 @@ const GeometryHelper = function () {
         return {vertices: newVertices, colors: newColors};
     };
 
-    const positionsCache = {};
-
+    /**
+     * Folds in a single triangle.
+     */
     const foldInTriangle = function (vertices, i0, i1, i2, percentage) {
         const vecA = vertices[i0];
         const vecB = vertices[i1];
@@ -104,6 +117,9 @@ const GeometryHelper = function () {
         vecA.copy(vecBC).add(vecABC);
     };
 
+    /**
+     * Folds in the three inner triangles on all sides.
+     */
     const foldIn = function (vertices, percentage) {
         for (let i = 0; i < vertices.length; i = i + 3 * 6) {
             foldInTriangle(vertices, i + 9, i + 10, i + 11, percentage);
@@ -112,6 +128,9 @@ const GeometryHelper = function () {
         }
     };
 
+    /**
+     * Recursively calculates the positions of the sub-tetrahedrons.
+     */
     const calculateSubPositions = function (depth, bases = [new THREE.Vector3()]) {
         if (depth < 1) {
             return bases;
@@ -132,17 +151,26 @@ const GeometryHelper = function () {
         return depth > 1 ? calculateSubPositions(depth - 1, newBases) : newBases;
     };
 
+    // this caches precalculated positions of the sub-tetrahedrons
+    const positionsCache = {};
+
     return {
+        /**
+         * Generates the geometry of the sierpinski tetrahedron.
+         */
         generate: function (time) {
+            // generate the base triangle and fold it up to a tetrahedron
             let {vertices, colors} = createBaseVertices();
             foldBasicVerticesUp(vertices, Math.min(1, time));
 
+            // calulate the positions of all sub-tetrahedrons
             const depth = Math.floor(time) - 1;
             let positions = positionsCache[depth];
             if (!positions) {
                 positions = positionsCache[depth] = calculateSubPositions(depth);
             }
 
+            // time > 1 means, we need to fold in the sides of the tetrahedron
             if (time > 1) {
                 if (time % 1 !== 0) {
                     ({vertices, colors} = split(vertices, colors, time % 1));
@@ -154,6 +182,7 @@ const GeometryHelper = function () {
                 });
             }
 
+            // calculate the normals
             let normals = [];
             for (let i = 0; i < vertices.length; i = i + 3) {
                 const vecA = vertices[i];
@@ -164,6 +193,7 @@ const GeometryHelper = function () {
                 normals.push(n);
             }
 
+            // repeat the geometry at every position and store it into attribute buffer
             const bufferVertices = new Array(positions.length * vertices.length * 3);
             const bufferColors = new Array(positions.length * vertices.length * 3);
             const bufferNormals = new Array(positions.length * vertices.length * 3);
