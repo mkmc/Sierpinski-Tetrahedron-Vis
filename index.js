@@ -2,7 +2,7 @@
 
 !function () {
 
-    const MAX_TIME = 9;
+    const MAX_TIME = 8;
 
     const options = {
         time: 1.5,
@@ -13,6 +13,10 @@
         useLambert: true,
         useDepth: true
     };
+
+    const playstopButtonElement = document.getElementById('playstop-button');
+    const progressBackgroundElement = document.getElementById('progress-background');
+    const progressValueElement = document.getElementById('progress-value');
 
     const canvasElement = document.getElementById('main-canvas');
     const renderer = new THREE.WebGLRenderer({
@@ -201,6 +205,15 @@
     const setTime = function (time) {
         clearScene();
 
+        if (!time) {
+            time = 0;
+        }
+
+        time = Math.min(MAX_TIME, Math.max(0, time));
+
+        options.time = time;
+        progressValueElement.style.width = time / MAX_TIME * 100 + '%';
+
         let {vertices, colors} = createBaseVertices();
         foldBasicVerticesUp(vertices, Math.min(1, time));
 
@@ -291,6 +304,30 @@
         setTime(options.time = Math.ceil(options.time));
     };
 
+    const togglePlay = function () {
+        options.animate = !options.animate;
+
+        if (options.animate) {
+            playstopButtonElement.classList.remove('fa-play');
+            playstopButtonElement.classList.add('fa-pause');
+        } else {
+            playstopButtonElement.classList.remove('fa-pause');
+            playstopButtonElement.classList.add('fa-play');
+        }
+    };
+
+    const pause = function () {
+        options.animate = 0;
+
+        playstopButtonElement.classList.remove('fa-pause');
+        playstopButtonElement.classList.add('fa-play');
+    };
+
+    playstopButtonElement.addEventListener('click', togglePlay);
+    progressBackgroundElement.addEventListener('click', function (e) {
+        setTime(e.offsetX / e.target.offsetWidth * MAX_TIME);
+    });
+
     // === GUI ===
 
     const gui = new dat.GUI();
@@ -303,17 +340,7 @@
     gui.add(options, 'useLambert').onChange(v => {
         material.uniforms.useLambert.value = v;
     });
-    gui.add(options, 'time', 0, MAX_TIME, 0.001).onChange(v => {
-        setTime(v);
-    }).listen();
-    gui.add(options, 'floor');
-    gui.add(options, 'ceiling');
     gui.add(options, 'speed', 0, 1, 0.01);
-    gui.add(options, 'animate').onChange(v => {
-        if (v && options.time === MAX_TIME) {
-            options.time = 0;
-        }
-    }).listen();
     gui.add(options, 'loop');
     gui.add(options, 'reset camera');
 
@@ -335,13 +362,12 @@
                     newTime -= MAX_TIME;
                 } else {
                     newTime = MAX_TIME;
-                    options.animate = false;
+                    pause();
                 }
             }
 
             if (options.time !== newTime) {
-                options.time = newTime;
-                setTime(options.time);
+                setTime(newTime);
             }
         }
 

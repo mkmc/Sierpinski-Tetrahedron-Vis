@@ -1,5 +1,6 @@
 <head>
     <title>Sierpinski Visualization</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
@@ -44,6 +45,14 @@
 </script>
 
 <canvas id="main-canvas"></canvas>
+
+<div id="control-overlay">
+    <i id="playstop-button" class="fa fa-play"></i>
+
+    <span id="progress-background">
+        <span id="progress-value"></span>
+    </span>
+</div>
 
 <script type="application/javascript"
         src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.2/dat.gui.min.js"></script>

@@ -8,4 +8,42 @@ body {
     width: 100% !important;
     height: 100% !important;
     background: linear-gradient(black, #303030);
+    z-index: 0;
+}
+
+#control-overlay {
+    box-sizing: border-box;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.2);
+    z-index: 10;
+    padding: 20px;
+    display: flex;
+}
+
+#playstop-button {
+    color: white;
+    bottom: 0;
+    margin: 10px;
+    height: 16px;
+}
+
+#progress-background {
+    display: inline-block;
+    padding: 0;
+    background: white;
+    height: 16px;
+    margin: 10px;
+    flex-grow: 1;
+}
+
+#progress-value {
+    display: inline-block;
+    height: 100%;
+    background-color: darkcyan;
+    margin: 0;
+    pointer-events: none;
 }
