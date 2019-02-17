@@ -16,14 +16,12 @@
     const playbackButton = document.getElementById('playback-button');
     const pauseButton = document.getElementById('pause-button');
     const playforwardButton = document.getElementById('playforward-button');
-
     const progressBarElement = document.getElementById('progress-bar');
     const progressValueElement = document.getElementById('progress-value');
 
-    const loopButton = document.getElementById('loop-button');
-
     const speedBarElement = document.getElementById('speed-bar');
     const speedValueElement = document.getElementById('speed-value');
+    const loopButton = document.getElementById('loop-button');
 
     const toStartButton = document.getElementById('tostart-button');
     const stepBackButton = document.getElementById('stepback-button');
@@ -33,7 +31,6 @@
     const useColorButton = document.getElementById('usecolor-button');
     const useDepthButton = document.getElementById('usedepth-button');
     const useLambertButton = document.getElementById('uselambert-button');
-
     const resetCamButton = document.getElementById('resetcam-button');
 
     const canvasElement = document.getElementById('main-canvas');
@@ -79,6 +76,9 @@
         scene.children = [];
     };
 
+    /**
+     * Sets the timestamp of the animation. This will generate a new geometry.
+     */
     const setTime = function (time) {
         clearScene();
 
@@ -105,6 +105,8 @@
         speedValueElement.style.width = speed / MAX_SPEED * 100 + '%';
     };
 
+    // === UI / CONTROLS ===
+
     const pause = function () {
         options.animate = false;
 
@@ -115,8 +117,6 @@
         playforwardButton.classList.remove('active');
         playforwardButton.classList.add('inactive');
     };
-
-    // === UI ===
 
     !function () {
         const playForward = function () {
@@ -256,6 +256,8 @@
                 lastTime = now;
             }
 
+            // calculate the new timestamp using dt.
+            // it stops at MAX_TIME / 0, unless options.loop === true
             if (options.animate) {
                 const dt = now - lastTime;
 
@@ -287,6 +289,7 @@
                 }
             }
 
+            // check if the canvas dimensions have changed
             if (renderer.getSize().width !== canvasElement.clientWidth
                 || renderer.getSize().height !== canvasElement.clientHeight) {
                 renderer.setPixelRatio(window.devicePixelRatio);
