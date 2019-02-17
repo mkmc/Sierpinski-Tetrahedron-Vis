@@ -6,23 +6,35 @@
     const MAX_SPEED = 2;
 
     const options = {
-        time: 1.5,
-        speed: 0.5,
+        time: 3.3,
+        speed: 0.3,
         animate: false,
+        forward: true,
         loop: false
     };
 
-    const playstopButton = document.getElementById('playstop-button');
-    const loopButton = document.getElementById('loop-button');
-    const useColorButton = document.getElementById('usecolor-button');
-    const useDepthButton = document.getElementById('usedepth-button');
-    const useLambertButton = document.getElementById('uselambert-button');
-    const resetCamButton = document.getElementById('resetcam-button');
+    const playbackButton = document.getElementById('playback-button');
+    const pauseButton = document.getElementById('pause-button');
+    const playforwardButton = document.getElementById('playforward-button');
 
     const progressBarElement = document.getElementById('progress-bar');
     const progressValueElement = document.getElementById('progress-value');
+
+    const loopButton = document.getElementById('loop-button');
+
     const speedBarElement = document.getElementById('speed-bar');
     const speedValueElement = document.getElementById('speed-value');
+
+    const toStartButton = document.getElementById('tostart-button');
+    const stepBackButton = document.getElementById('stepback-button');
+    const stepForwardButton = document.getElementById('stepforward-button');
+    const toEndButton = document.getElementById('toend-button');
+
+    const useColorButton = document.getElementById('usecolor-button');
+    const useDepthButton = document.getElementById('usedepth-button');
+    const useLambertButton = document.getElementById('uselambert-button');
+
+    const resetCamButton = document.getElementById('resetcam-button');
 
     const canvasElement = document.getElementById('main-canvas');
 
@@ -38,7 +50,7 @@
     const scene = new THREE.Scene();
 
     const material = new THREE.ShaderMaterial({
-        uniforms: {useColor: {value: true}, useDepth: {value: true}, useLambert: {value: true}},
+        uniforms: {useColor: {value: false}, useDepth: {value: true}, useLambert: {value: true}},
         vertexShader: document.getElementById('vertexShader').textContent,
         fragmentShader: document.getElementById('fragmentShader').textContent,
         side: THREE.DoubleSide
@@ -94,29 +106,49 @@
     };
 
     const pause = function () {
-        options.animate = 0;
+        options.animate = false;
 
-        playstopButton.classList.remove('fa-pause');
-        playstopButton.classList.add('fa-play');
+        playbackButton.classList.remove('active');
+        playbackButton.classList.add('inactive');
+        pauseButton.classList.remove('inactive');
+        pauseButton.classList.add('active');
+        playforwardButton.classList.remove('active');
+        playforwardButton.classList.add('inactive');
     };
 
     // === UI ===
 
     !function () {
-        const togglePlay = function () {
-            options.animate = !options.animate;
+        const playForward = function () {
+            options.animate = true;
+            options.forward = true;
 
-            if (options.animate) {
-                if (options.time === MAX_TIME) {
-                    options.time = 0;
-                }
-
-                playstopButton.classList.remove('fa-play');
-                playstopButton.classList.add('fa-pause');
-            } else {
-                playstopButton.classList.remove('fa-pause');
-                playstopButton.classList.add('fa-play');
+            if (options.time === MAX_TIME) {
+                options.time = 0;
             }
+
+            playbackButton.classList.remove('active');
+            playbackButton.classList.add('inactive');
+            pauseButton.classList.remove('active');
+            pauseButton.classList.add('inactive');
+            playforwardButton.classList.remove('inactive');
+            playforwardButton.classList.add('active');
+        };
+
+        const playBack = function () {
+            options.animate = true;
+            options.forward = false;
+
+            if (options.time === 0) {
+                options.time = MAX_TIME;
+            }
+
+            playbackButton.classList.remove('inactive');
+            playbackButton.classList.add('active');
+            pauseButton.classList.remove('active');
+            pauseButton.classList.add('inactive');
+            playforwardButton.classList.remove('active');
+            playforwardButton.classList.add('inactive');
         };
 
         const toggleLoop = function () {
@@ -167,12 +199,28 @@
             }
         };
 
-        playstopButton.addEventListener('click', togglePlay);
+        playbackButton.addEventListener('click', playBack);
+        pauseButton.addEventListener('click', pause);
+        playforwardButton.addEventListener('click', playForward);
+
         loopButton.addEventListener('click', toggleLoop);
         useColorButton.addEventListener('click', toggleColor);
         useDepthButton.addEventListener('click', toggleDepth);
         useLambertButton.addEventListener('click', toggleLambert);
         resetCamButton.addEventListener('click', resetCamera);
+
+        toStartButton.addEventListener('click', function () {
+            setTime(0);
+        });
+        stepBackButton.addEventListener('click', function () {
+            setTime(Math.floor(options.time - 0.01));
+        });
+        stepForwardButton.addEventListener('click', function () {
+            setTime(Math.ceil(options.time + 0.01));
+        });
+        toEndButton.addEventListener('click', function () {
+            setTime(MAX_TIME);
+        });
 
         let isBoundToProgress = false;
         let isBoundToSpeed = false;
@@ -211,13 +259,26 @@
             if (options.animate) {
                 const dt = now - lastTime;
 
-                let newTime = options.time + options.speed * dt / 1000;
-                while (newTime > MAX_TIME) {
-                    if (options.loop) {
-                        newTime -= MAX_TIME;
-                    } else {
-                        newTime = MAX_TIME;
-                        pause();
+                let newTime = 0;
+                if (options.forward) {
+                    newTime = options.time + options.speed * dt / 1000;
+                    while (newTime > MAX_TIME) {
+                        if (options.loop) {
+                            newTime -= MAX_TIME;
+                        } else {
+                            newTime = MAX_TIME;
+                            pause();
+                        }
+                    }
+                } else {
+                    newTime = options.time - options.speed * dt / 1000;
+                    while (newTime < 0) {
+                        if (options.loop) {
+                            newTime += MAX_TIME;
+                        } else {
+                            newTime = 0;
+                            pause();
+                        }
                     }
                 }
 

@@ -24,11 +24,18 @@ body {
     background-color: rgba(0,0,0,0.2);
     z-index: 10;
     padding: 10px;
-    display: flex;
-    overflow: visible;
 }
 
-#control-overlay > * {
+#control-overlay > div {
+    width: 100%;
+    display: flex;
+}
+
+#control-overlay i {
+    color: white;
+}
+
+#control-overlay > div > * {
     margin: 5px;
     height: 16px;
 }
@@ -37,16 +44,14 @@ body {
     display: inline-block;
     padding: 0;
     background: white;
-    height: 16px;
-    margin: 5px;
 }
 
-#progress-bar {
+#progress-bar, .filler {
     flex-grow: 1;
 }
 
 #speed-bar {
-    width: 50px;
+    width: 60px;
     position: relative;
 }
 
@@ -58,11 +63,7 @@ body {
     pointer-events: none;
 }
 
-#playstop-button {
-    color: white;
-}
-
-#resetcam-button {
+#control-overlay #resetcam-button {
     font-size: 75%;
     margin-top: 1px;
 }
@@ -76,10 +77,10 @@ body {
     color: black;
 }
 
-.inactive {
+#control-overlay .inactive {
     color: gray;
 }
 
-.active {
+#control-overlay .active {
     color: darkcyan;
 }

@@ -50,26 +50,40 @@
 <canvas id="main-canvas"></canvas>
 
 <div id="control-overlay">
-    <i id="playstop-button" class="fa fa-play"></i>
 
-    <span id="progress-bar">
-        <span id="progress-value"></span>
-    </span>
+    <div>
+        <i id="playback-button" title="play animation backwards" class="fa fa-play fa-flip-horizontal inactive"></i>
+        <i id="pause-button" title="pause animation" class="fa fa-pause active"></i>
+        <i id="playforward-button" title="play animation" class="fa fa-play inactive"></i>
 
-    <i id="loop-button" title="loop animation" class="fas fa-redo-alt inactive"></i>
 
-    <span title="animation speed" id="speed-bar">
-        <span id="speed-value"></span>
-    </span>
+        <span id="progress-bar">
+            <span id="progress-value"></span>
+        </span>
+    </div>
+    <div>
+        <i id="tostart-button" title="jump to start" class="fa fa-fast-forward fa-flip-horizontal"></i>
+        <i id="stepback-button" title="jump to previous step" class="fa fa-step-forward fa-flip-horizontal"></i>
+        <i id="stepforward-button" title="jump to next step" class="fa fa-step-forward"></i>
+        <i id="toend-button" title="jump to end" class="fa fa-fast-forward"></i>
 
-    <span id="resetcam-button" title="reset camera" class="fa-stack">
-        <i class="fas fa-video fa-stack-2x"></i>
-        <i class="fas fa-redo-alt fa-stack-1x fa-inverse"></i>
-    </span>
+        <span title="animation speed" id="speed-bar">
+            <span id="speed-value"></span>
+        </span>
 
-    <i id="usecolor-button" title="color triangles" class="fas fa-palette active"></i>
-    <i id="usedepth-button" title="more distant triangles are darker" class="fas fa-ruler-horizontal active"></i>
-    <i id="uselambert-button" title="use lambert shading" class="fas fa-sun active"></i>
+        <i id="loop-button" title="loop animation" class="fas fa-redo-alt inactive"></i>
+
+        <span class="filler"></span>
+
+        <i id="usecolor-button" title="color triangles" class="fas fa-palette inactive"></i>
+        <i id="usedepth-button" title="more distant triangles are darker" class="fas fa-ruler-horizontal active"></i>
+        <i id="uselambert-button" title="use lambert shading" class="fas fa-sun active"></i>
+
+        <span id="resetcam-button" title="reset camera" class="fa-stack">
+            <i class="fas fa-video fa-stack-2x"></i>
+            <i class="fas fa-undo-alt fa-stack-1x fa-inverse"></i>
+        </span>
+    </div>
 </div>
 
 <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/93/three.min.js"></script>
