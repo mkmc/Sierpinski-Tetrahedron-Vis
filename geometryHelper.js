@@ -151,6 +151,18 @@ const GeometryHelper = function () {
         return depth > 1 ? calculateSubPositions(depth - 1, newBases) : newBases;
     };
 
+    const calculateNormals = function (vertices) {
+        const normals = new Array(vertices.length / 3);
+        for (let i = 0; i < vertices.length; i = i + 3) {
+            const vecA = vertices[i];
+            const vecB = vertices[i + 1];
+            const vecC = vertices[i + 2];
+
+            normals[i/3] = vecA.clone().sub(vecB).normalize().cross(vecA.clone().sub(vecC).normalize()).normalize();
+        }
+        return normals;
+    };
+
     // this caches precalculated positions of the sub-tetrahedrons
     const positionsCache = {};
 
@@ -183,15 +195,7 @@ const GeometryHelper = function () {
             }
 
             // calculate the normals
-            let normals = [];
-            for (let i = 0; i < vertices.length; i = i + 3) {
-                const vecA = vertices[i];
-                const vecB = vertices[i + 1];
-                const vecC = vertices[i + 2];
-
-                const n = vecA.clone().sub(vecB).normalize().cross(vecA.clone().sub(vecC).normalize()).normalize();
-                normals.push(n);
-            }
+            const normals = calculateNormals(vertices);
 
             // repeat the geometry at every position and store it into attribute buffer
             const bufferVertices = new Array(positions.length * vertices.length * 3);
